@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
 const sequelize = require("./database/db"); // Importamos la conexión a la base de datos
-const PORT = 4250;
+const PORT = 3000;
 
 app.use(bodyParser.json());
 app.use(
@@ -27,7 +27,7 @@ sequelize
   });
 
 //CRUD Productos
-app.get("/productos", (req, res) => {
+app.get("/products/getAll", (req, res) => {
   try {
     const products = Product.findAll({ attributes: ["marca", "descripcion", "valorUnidad", "stock", "activo"] });
     res.json(products);
@@ -37,13 +37,15 @@ app.get("/productos", (req, res) => {
 });
 
 //Create
-app.post("/productos", async (req, res) => {
+app.post("/product/upload", async (req, res) => {
   const { marca, descripcion, valorUnidad, stock, activo } = req.body;
 
   // Validar activo
-  if (activo !== "true" && activo !== "false") {
-    return res.status(400).json({ message: "El valor de 'activo' debe ser 'true' o 'false'" });
+  if (activo !== 1 && activo !== 0) {
+    return res.status(400).json({ message: "El valor de 'activo' debe ser 1 o 0" });
   }
+
+  //console.log(req.body)
 
   try {
     const product = await Product.create({ marca, descripcion, valorUnidad, stock, activo });
@@ -54,9 +56,44 @@ app.post("/productos", async (req, res) => {
 });
 
 //"Delete" (en realidad es baja lógica)
-app.put("/productos/delete/:id", async (req, res) => {
-  const { id } = req.body;
+app.put("/product/delete/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // Baja lógica: cambiamos el estado "activo" a 0
+    await product.update({ activo: 0 });
+
+    res.status(200).json({ message: "El producto fue desactivado correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: "Ocurrió un error al desactivar el producto", error });
+  }
 });
 
+
 //Update
-app.put("/productos/update/:id", async (req, res) => {});
+app.put("/product/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const { marca, descripcion, valorUnidad, stock, activo } = req.body;
+
+  try {
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // Actualizamos los campos proporcionados
+    await product.update({ marca, descripcion, valorUnidad, stock, activo });
+
+    res.status(200).json({ message: "El producto fue actualizado correctamente", product });
+  } catch (error) {
+    res.status(500).json({ message: "Ocurrió un error al actualizar el producto", error });
+  }
+});
+

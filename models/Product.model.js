@@ -24,7 +24,7 @@ const Product = sequelize.define("Product", {
   },
   //Si el producto sigue activo o ya no
   activo: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
     allowNull: false
   }
 });
