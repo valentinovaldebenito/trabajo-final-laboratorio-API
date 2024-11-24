@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../database/db");
+const sequelize = require("../database/db.js");
 
-const Product = sequelize.define("Product", {
+const Product = sequelize.define("products", {
   //Marca del producto ej(Marolio, Cocacola)
   marca: {
     type: DataTypes.STRING,
@@ -25,8 +25,8 @@ const Product = sequelize.define("Product", {
   //Si el producto sigue activo o ya no
   activo: {
     type: DataTypes.BOOLEAN,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 module.exports = Product;
