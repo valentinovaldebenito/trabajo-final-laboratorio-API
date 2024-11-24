@@ -2,7 +2,7 @@ const { Sequelize } = require("sequelize");
 
 //Configuracion de Sequelize con los datos de la Dase de Datos
 const sequelize = new Sequelize("gestor-de-productos", "root", "", {
-  host: "127.0.0.1",
+  host: "localhost",
   dialect: "mysql",
 });
 
